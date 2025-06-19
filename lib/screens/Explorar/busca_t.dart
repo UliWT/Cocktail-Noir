@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/widgets/main_scaffold.dart';
 import 'package:myapp/widgets/boton.dart';
-import 'package:myapp/widgets/tarjeta.dart';
 import 'package:myapp/data/tragos.dart';
+import 'package:myapp/widgets/modalSheet.dart';
 
 typedef Tag = String;
 
@@ -54,9 +54,8 @@ class _BuscarTScreenState extends State<BuscarTScreen> {
       }
     }
 
-    if (mejorTrago != null) {
-      mostrarDetalleTrago(context, mejorTrago);
-    } else {
+      if (mejorTrago != null) {mostrarDetalleTrago(context, mejorTrago!, onFavoritoChanged: () => setState(() {}));}
+     else {
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
@@ -72,48 +71,6 @@ class _BuscarTScreenState extends State<BuscarTScreen> {
         ),
       );
     }
-  }
-
-  void mostrarDetalleTrago(BuildContext context, Map<String, dynamic> trago) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-      ),
-      builder: (context) => DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.7,
-        minChildSize: 0.4,
-        maxChildSize: 0.95,
-        builder: (context, scrollController) {
-          return Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
-              border: Border.all(color: const Color(0xFFD4AF37), width: 2),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black87,
-                  blurRadius: 10,
-                  offset: Offset(0, -2),
-                ),
-              ],
-            ),
-            child: SingleChildScrollView(
-              controller: scrollController,
-              padding: const EdgeInsets.all(20),
-              child: Tarjeta.desdeMapa(
-                trago,
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-              ),
-            ),
-          );
-        },
-      ),
-    );
   }
 
   @override

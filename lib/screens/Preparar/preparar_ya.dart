@@ -4,7 +4,7 @@ import 'package:myapp/widgets/textField.dart';
 import 'package:myapp/widgets/tarjeta.dart';
 import 'package:myapp/favoritos_manager.dart';
 import 'package:myapp/data/tragos.dart' as data;
-import 'package:myapp/widgets/modalSheet.dart';  // <-- Importamos modalSheet
+import 'package:myapp/widgets/modalSheet.dart';  // Importamos el modalSheet
 
 class PrepararYaScreen extends StatefulWidget {
   const PrepararYaScreen({super.key});
@@ -24,7 +24,13 @@ class _PrepararYaScreenState extends State<PrepararYaScreen> {
   }
 
   void _mostrarDetalle(BuildContext context, Map<String, dynamic> trago) {
-    mostrarDetalleTrago(context, trago); // Usamos el modalSheet con tarjeta
+    mostrarDetalleTrago(
+      context,
+      trago,
+      onFavoritoChanged: () {
+        setState(() {}); // Solo refrescamos la pantalla para actualizar la estrella fuera del modal
+      },
+    );
   }
 
   @override

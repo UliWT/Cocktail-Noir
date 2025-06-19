@@ -133,7 +133,7 @@ class _PIngScreenState extends State<PIngScreen> {
                       Text('No se encontraron tragos.', style: TextStyle(color: Colors.grey.shade400))
                     else
                       ...tragosPosibles.map((trago) => GestureDetector(
-                            onTap: () => mostrarDetalleTrago(context, trago),
+                            onTap: () => mostrarDetalleTrago(context, trago, onFavoritoChanged: () {  }),
                             child: Tarjeta(
                               nombre: trago['nombre'] as String,
                               descripcion: trago['descripcion'] as String?,
@@ -165,7 +165,7 @@ class _PIngScreenState extends State<PIngScreen> {
                         }).toList();
 
                         return GestureDetector(
-                          onTap: () => mostrarDetalleTrago(context, trago),
+                          onTap: () => mostrarDetalleTrago(context, trago, onFavoritoChanged: () {  }),
                           child: Tarjeta(
                             nombre: trago['nombre'] as String,
                             descripcion:

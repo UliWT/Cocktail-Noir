@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:myapp/widgets/main_scaffold.dart';
 import 'package:myapp/widgets/tarjeta.dart';
 import 'package:myapp/favoritos_manager.dart';
+import 'package:myapp/widgets/modalSheet.dart';
 
 class NovedadesScreen extends StatefulWidget {
   const NovedadesScreen({super.key});
@@ -45,46 +46,10 @@ class _NovedadesScreenState extends State<NovedadesScreen> {
   ];
 
   void _mostrarDetalleTrago(BuildContext context, Map<String, dynamic> trago) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) => DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.7,
-        minChildSize: 0.4,
-        maxChildSize: 0.95,
-        builder: (context, scrollController) {
-          return Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
-              border: Border.all(color: const Color(0xFFD4AF37), width: 2),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black87,
-                  blurRadius: 10,
-                  offset: Offset(0, -2),
-                ),
-              ],
-            ),
-            child: SingleChildScrollView(
-              controller: scrollController,
-              padding: const EdgeInsets.all(20),
-              child: Tarjeta(
-                nombre: trago['nombre'],
-                descripcion: trago['descripcion'],
-                ingredientes: trago['ingredientes'],
-                preparacion: trago['preparacion'],
-                decoracion: trago['decoracion'],
-                tags: List<String>.from(trago['tags'] ?? []),
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-              ),
-            ),
-          );
-        },
-      ),
+    mostrarDetalleTrago(
+      context,
+      trago,
+      onFavoritoChanged: () => setState(() {}),
     );
   }
 
