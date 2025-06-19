@@ -4,6 +4,7 @@ import 'package:myapp/screens/NavBar/ajustes.dart';
 import 'package:myapp/screens/NavBar/crear.dart';
 import 'package:myapp/screens/NavBar/favoritos.dart';
 import 'package:myapp/screens/NavBar/mi_bar.dart';
+import 'package:myapp/favoritos_manager.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,6 +15,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Intentamos cargar favoritos (no async porque ya no hace nada)
+    try {
+      FavoritosManager().cargarFavoritos();
+    } catch (e) {
+      debugPrint('Error cargando favoritos: $e');
+    }
+
     return MaterialApp(
       title: 'Cocktail Noir',
       debugShowCheckedModeBanner: false,
