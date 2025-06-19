@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/screens/home.dart';
-import 'package:myapp/widgets/main_navigation.dart';
-import 'package:myapp/widgets/main_scaffold.dart';
+import 'package:myapp/screens/NavBar/ajustes.dart';
+import 'package:myapp/screens/NavBar/crear.dart';
+import 'package:myapp/screens/NavBar/favoritos.dart';
+import 'package:myapp/screens/NavBar/mi_bar.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,7 +17,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Cocktail Noir',
       debugShowCheckedModeBanner: false,
-      home: const HomeScreen(),
+      initialRoute: '/home',
+      routes: {
+        '/home': (context) => const HomeScreen(),
+        '/ajustes': (context) => const AjustesScreen(),
+        '/crear': (context) => const CrearScreen(),
+        '/mi_bar': (context) => const MiBarScreen(),
+        '/favoritos': (context) => const FavoritosScreen(),
+      },
       theme: ThemeData(
         scaffoldBackgroundColor: const Color(0xFF1A1A1A),
         appBarTheme: const AppBarTheme(

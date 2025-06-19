@@ -5,7 +5,6 @@ import 'Preparar/preparar_ya.dart';
 import 'package:myapp/widgets/boton.dart';
 import 'package:myapp/widgets/main_scaffold.dart';
 
-
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -19,7 +18,7 @@ class HomeScreen extends StatelessWidget {
           const Text(
             'Cocktail Noir',
             style: TextStyle(
-              fontSize: 40,
+              fontSize: 50,
               fontWeight: FontWeight.bold,
               color: Color(0xFFFFCD29),
               letterSpacing: 1.5,
@@ -46,7 +45,10 @@ class HomeScreen extends StatelessWidget {
 
           Boton(
             texto: 'Preparar ya',
-            padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 40),
+             style: TextStyle(
+              fontSize: 32,
+             ),
             borderRadius: 10,
             onPressed: () {
               Navigator.push(
@@ -58,7 +60,10 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(height: 20),
           Boton(
             texto: 'Explorar',
-            padding: const EdgeInsets.symmetric(horizontal: 69, vertical: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 83, vertical: 40),
+             style: TextStyle(
+              fontSize: 32
+             ),
             borderRadius: 10,
             onPressed: () {
               Navigator.push(

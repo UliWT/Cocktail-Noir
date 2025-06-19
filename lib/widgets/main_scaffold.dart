@@ -26,19 +26,23 @@ class MainScaffold extends StatelessWidget {
         onItemSelected: (index) {
           // Navegación según el índice
           switch (index) {
-            case 0:
-              Navigator.pushReplacementNamed(context, '/ajustes');
-              break;
-            case 1:
-              Navigator.pushReplacementNamed(context, '/crear');
-              break;
-            case 2:
-              Navigator.pushReplacementNamed(context, '/mi_bar');
-              break;
-            case 3:
-              Navigator.pushReplacementNamed(context, '/favoritos');
-              break;
-          }
+              case 0:
+                Navigator.pushReplacementNamed(context, '/home');
+                break;
+              case 1:
+                Navigator.pushReplacementNamed(context, '/ajustes');
+                break;
+              case 2:
+                Navigator.pushReplacementNamed(context, '/crear');
+                break;
+              case 3:
+                Navigator.pushReplacementNamed(context, '/mi_bar');
+                break;
+              case 4:
+                Navigator.pushReplacementNamed(context, '/favoritos');
+                break;
+            }
+
         },
       ),
     );
