@@ -3,6 +3,7 @@ import 'package:myapp/widgets/main_scaffold.dart';
 import 'package:myapp/widgets/textField.dart';
 import 'package:myapp/widgets/tarjeta.dart';
 import 'package:myapp/favoritos_manager.dart';
+import 'package:myapp/data/tragos.dart' as data;
 
 class PrepararYaScreen extends StatefulWidget {
   const PrepararYaScreen({super.key});
@@ -14,131 +15,6 @@ class PrepararYaScreen extends StatefulWidget {
 class _PrepararYaScreenState extends State<PrepararYaScreen> {
   final TextEditingController _controller = TextEditingController();
   String _busqueda = '';
-
-final List<Map<String, dynamic>> tragos = [
-{
-    'nombre': 'Espresso Martini',
-    'descripcion': 'Intenso y sofisticado. Ideal para cerrar la noche con energía y estilo.',
-    'ingredientes': '1 shot de espresso (30 ml)\nVodka 45 ml\nKahlúa 30 ml\nAlmíbar 10 ml',
-    'preparacion': '1. Mezclar todos los ingredientes en una coctelera con hielo\n2. Agitar enérgicamente durante 20 segundos\n3. Servir en una copa de martini',
-    'decoracion': 'Granos de café',
-    'tags': ['Vodka', 'Sedoso', 'Dulce', 'Amargo'],
-  },
-  {
-    'nombre': 'Mojito',
-    'descripcion': 'Refrescante y cítrico, el clásico cubano para días calurosos.',
-    'ingredientes': 'Ron blanco 50 ml\n8-10 hojas de hierbabuena\n2 cucharaditas de azúcar\n30 ml jugo de lima\nSoda al gusto',
-    'preparacion': '1. Machacar la hierbabuena con azúcar y lima\n2. Agregar ron y hielo\n3. Completar con soda y mezclar suavemente\n4. Servir en vaso highball',
-    'decoracion': 'Hojas de hierbabuena',
-    'tags': ['Ron', 'Refrescante', 'Cítrico', 'Herbal'],
-  },
-  {
-    'nombre':'Negroni',
-    'descripcion':'Elegante y robusto. La sofisticación italiana en su expresión más pura y contundente.',
-    'ingredientes':'Campari 30 ml\nVermouth Rosso 30 ml\nGin 30 ml',
-    'preparacion':'1. En un vaso mezclador lleno de hielo poner todos los ingredientes\n2. Revolver durante 20 segundos\n3. Servir en vaso Rocks',
-    'decoracion':'Cáscara de naranja',
-    'tags':['Campari', 'Amargo', 'Clásico'],
-  },
-  {
-    'nombre': 'Piña Colada',
-    'descripcion': 'Dulce y cremoso, un clásico tropical para relajarse.',
-    'ingredientes': 'Ron blanco 50 ml\nCrema de coco 30 ml\nJugo de piña 90 ml',
-    'preparacion': '1. Licuar todos los ingredientes con hielo\n2. Servir en vaso hurricane',
-    'decoracion': 'Trozo de piña y cereza',
-    'tags': ['Ron', 'Tropical', 'Cremoso'],
-  },
-  {
-    'nombre': 'Margarita',
-    'descripcion': 'Cítrico y refrescante, el rey de los cócteles mexicanos.',
-    'ingredientes': 'Tequila 50 ml\nTriple sec 20 ml\nJugo de lima 30 ml\nSal para escarchar el borde',
-    'preparacion': '1. Escarchar el borde del vaso con sal y limón\n2. Mezclar todos los ingredientes en una coctelera con hielo\n3. Agitar enérgicamente durante 20 segundos\n4. Servir en copa Margarita escarchada',
-    'decoracion': 'Rodaja de lima',
-    'tags': ['Tequila', 'Fresco', 'Salado'],
-  },
-  {
-    'nombre': 'Old Fashioned',
-    'descripcion': 'Clásico y robusto, para quienes disfrutan del whisky puro.',
-    'ingredientes': 'Whisky bourbon 60 ml\n1 terrón de azúcar\n2 dashes de angostura\nHielo al gusto',
-    'preparacion': '1. Disolver azúcar con angostura en el vaso\n2. Agregar hielo y whisky\n3. Revolver suavemente\n4. Servir en vaso Rocks',
-    'decoracion': 'Cáscara de naranja',
-    'tags': ['Whisky', 'Clasico', 'Seco'],
-  },
-  {
-    'nombre': 'Cosmopolitan',
-    'descripcion': 'Elegante y afrutado, favorito en las noches urbanas.',
-    'ingredientes': 'Vodka 45 ml\nTriple sec 15 ml\nJugo de arándano 30 ml\nJugo de lima 15 ml',
-    'preparacion': '1. Mezclar todos los ingredientes en una coctelera con hielo\n2. Agitar enérgicamente durante 20 segundos\n3. Servir en una copa de martini',
-    'decoracion': 'Twist de lima',
-    'tags': ['Vodka', 'Cítrico', 'Dulce'],
-  },
-  {
-    'nombre': 'Daiquiri',
-    'descripcion': 'Fresco y simple, un clásico cubano que nunca falla.',
-    'ingredientes': 'Ron blanco 50 ml\nJugo de lima 25 ml\n2 cucharaditas de azúcar',
-    'preparacion': '1. Mezclar todos los ingredientes en una coctelera con hielo\n2. Agitar enérgicamente durante 20 segundos\n3. Servir en una copa coupe',
-    'decoracion': 'Rodaja de lima',
-    'tags': ['Ron', 'Fresco', 'Dulce'],
-  },
-  {
-    'nombre': 'Caipirinha',
-    'descripcion': 'El trago nacional de Brasil, cítrico y dulce.',
-    'ingredientes': 'Cachaça 50 ml\n1 lima cortada en trozos\n2 cucharaditas de azúcar',
-    'preparacion': '1. Machacar la lima con azúcar\n2. Agregar cachaça y hielo\n3. Servir en vaso Rocks',
-    'decoracion': 'Trozo de lima',
-    'tags': ['Cachaça', 'Dulce', 'Refrescante'],
-  },
-  {
-    'nombre': 'French 75',
-    'descripcion': 'Burbujeante y elegante, ideal para celebraciones.',
-    'ingredientes': 'Gin 30 ml\nChampagne 60 ml\nJugo de limón 15 ml\n1 cucharadita de azúcar',
-    'preparacion': '1. Agitar gin, limón y azúcar con hielo\n2. Colar y servir en copa flauta\n3. Completar con champagne',
-    'decoracion': 'Twist de limón',
-    'tags': ['Gin', 'Cítrico', 'Elegante'],
-  },
-  {
-    'nombre': 'Whisky Sour',
-    'descripcion': 'Equilibrado y refrescante. El equilibrio magistral entre tradición y frescura cítrica.',
-    'ingredientes':'Whisky 60 ml\nAlmibar 20ml\nJugo de limón 30 ml\n1 Clara de huevo',
-    'preparacion':'1. Mezclar todos los ingredientes en una coctelera sin hielo\n2. Agitar en seco durante 20 segundos\n3.Agregar hielo a la coctelera y agitar durante 10 segundos\n4.Servir en una copa coupe previamente enfriada',
-    'decoracion': 'Gotas de Bitter de Angostura',
-    'tags': ['Whisky', 'Cítrico', 'Clasico'],
-  },
-  {
-    'nombre': 'Manhattan',
-    'descripcion': 'Elegante y fuerte, un clásico neoyorquino.',
-    'ingredientes': 'Whisky rye 50 ml\nVermouth rojo 20 ml\n2 dashes de angostura',
-    'preparacion': '1. En un vaso mezclador lleno de hielo poner todos los ingredientes\n2. Revolver durante 20 segundos\n3. Servir en vaso old fashioned',
-    'decoracion': 'Cereza',
-    'tags': ['Whisky rye', 'Dulce', 'Elegante'],
-  },
-  {
-    'nombre': 'Gin Tonic',
-    'descripcion': 'Simple, refrescante y perfecto para cualquier ocasión.',
-    'ingredientes': 'Gin 50 ml\nTónica al gusto\nRodaja de lima o pepino',
-    'preparacion': '1. Llenar vaso con hielo\n2. Agregar gin\n3. Completar con tónica\n4. Servir en vaso balón o highball',
-    'decoracion': 'Rodaja de lima o pepino',
-    'tags': ['Gin', 'Simple', 'Cítrico'],
-  },
-  {
-    'nombre': 'Bloody Mary',
-    'descripcion': 'Salado y picante, ideal para brunchs.',
-    'ingredientes': 'Vodka 50 ml\nJugo de tomate 120 ml\nSalsa Worcestershire 2 gotas\nSalsa Tabasco al gusto\nSal y pimienta al gusto',
-    'preparacion': '1. Mezclar todos los ingredientes en una coctelera con hielo\n2. Agitar enérgicamente durante 20 segundos\n3. Servir en un highball',
-    'decoracion': 'Apio',
-    'tags': ['Vodka', 'Picante', 'Refrescante'],
-  },
-  {
-    'nombre': 'Sex on the Beach',
-    'descripcion': 'Dulce y frutal, clásico de verano.',
-    'ingredientes': 'Vodka 40 ml\nLicor de durazno 20 ml\nJugo de naranja 40 ml\nJugo de arándano 40 ml',
-    'preparacion': '1. Mezclar todos los ingredientes en una coctelera con hielo\n2. Agitar enérgicamente durante 20 segundos\n3. Servir en un highball',
-    'decoracion': 'Rodaja de naranja',
-    'tags': ['Vodka', 'Frutal', 'Fresco'],
-  },
-];
-
-
 
   void _realizarBusqueda() {
     setState(() {
@@ -270,12 +146,12 @@ final List<Map<String, dynamic>> tragos = [
 
   @override
   Widget build(BuildContext context) {
-    final tragosFiltrados = tragos.where((trago) {
+    final tragosFiltrados = data.tragos.where((trago) {
       return trago['nombre'].toLowerCase().contains(_busqueda.toLowerCase());
     }).toList();
 
     return MainScaffold(
-      selectedIndex: -1,
+      selectedIndex: 0,
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1A1A),
         elevation: 0,
@@ -309,7 +185,7 @@ final List<Map<String, dynamic>> tragos = [
                         return GestureDetector(
                           onTap: () => _mostrarDetalle(context, tragoActual),
                           child: Tarjeta(
-                            titulo: tragoActual['nombre'],
+                            nombre: tragoActual['nombre'],
                             descripcion: tragoActual['descripcion'],
                             tags: List<String>.from(tragoActual['tags']),
                             width: double.infinity,

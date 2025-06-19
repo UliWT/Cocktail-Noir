@@ -6,14 +6,12 @@ class MiBarManager {
 
   MiBarManager._interno();
 
-  /// Inicializa las categorías vacías si no existen
   void inicializarCategorias(Iterable<String> categorias) {
     for (var cat in categorias) {
       _seleccionados.putIfAbsent(cat, () => <String>{});
     }
   }
 
-  /// Alterna el estado de selección
   void toggleSeleccion(String categoria, String item) {
     final set = _seleccionados.putIfAbsent(categoria, () => <String>{});
     if (set.contains(item)) {
@@ -23,11 +21,18 @@ class MiBarManager {
     }
   }
 
-  /// Devuelve si un ítem está seleccionado
   bool esSeleccionado(String categoria, String item) {
     return _seleccionados[categoria]?.contains(item) ?? false;
   }
 
-  /// Devuelve el mapa completo
   Map<String, Set<String>> obtenerSeleccionados() => _seleccionados;
+
+  // Método para obtener todos los ingredientes seleccionados como lista plana
+  List<String> getAllSelectedIngredients() {
+    final all = <String>{};
+    for (var set in _seleccionados.values) {
+      all.addAll(set);
+    }
+    return all.toList();
+  }
 }

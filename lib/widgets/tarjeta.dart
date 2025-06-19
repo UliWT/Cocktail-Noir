@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/favoritos_manager.dart';
-import 'tag.dart'; // Tu widget de tag
+import 'tag.dart';
 
 class Tarjeta extends StatelessWidget {
-  final String titulo;
+  final String nombre;
   final String? descripcion;
   final String? ingredientes;
   final String? preparacion;
@@ -12,13 +12,15 @@ class Tarjeta extends StatelessWidget {
   final double? width;
   final double? height;
   final EdgeInsetsGeometry? padding;
+  final VoidCallback? onTap;
 
-  final Map<String, dynamic>? trago;
+  final Map<String, dynamic>? trago; // para pasar el mapa entero
   final VoidCallback? onToggleFavorito;
 
+  // Constructor principal (con parámetros explícitos)
   const Tarjeta({
-    super.key,
-    required this.titulo,
+    Key? key,
+    required this.nombre,
     this.descripcion,
     this.ingredientes,
     this.preparacion,
@@ -29,7 +31,37 @@ class Tarjeta extends StatelessWidget {
     this.padding,
     this.trago,
     this.onToggleFavorito,
-  });
+    this.onTap,
+  }) : super(key: key);
+
+  // Constructor de fábrica que crea la tarjeta a partir de un Map (ej. un trago)
+  factory Tarjeta.desdeMapa(
+    Map<String, dynamic> trago, {
+    Key? key,
+    double? width,
+    double? height,
+    EdgeInsetsGeometry? padding,
+    VoidCallback? onToggleFavorito,
+  }) {
+    return Tarjeta(
+      key: key,
+      nombre: trago['nombre'] ?? '',
+      descripcion: trago['descripcion'],
+      ingredientes: trago['ingredientes'] is List<String>
+          ? (trago['ingredientes'] as List<String>).join('\n')
+          : trago['ingredientes']?.toString(),
+      preparacion: trago['preparacion'],
+      decoracion: trago['decoracion'],
+      tags: trago['tags'] != null
+          ? List<String>.from(trago['tags'])
+          : <String>[],
+      width: width,
+      height: height,
+      padding: padding,
+      trago: trago,
+      onToggleFavorito: onToggleFavorito,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +73,7 @@ class Tarjeta extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF2C2C2C),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Color(0xFFFFD829), width: 2),
+        border: Border.all(color: const Color(0xFFFFD829), width: 2),
       ),
       child: Stack(
         children: [
@@ -49,7 +81,7 @@ class Tarjeta extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                titulo,
+                nombre,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
@@ -57,10 +89,13 @@ class Tarjeta extends StatelessWidget {
                 ),
               ),
               if (descripcion != null && descripcion!.trim().isNotEmpty)
-                Text(
-                  descripcion!,
-                  style: const TextStyle(color: Colors.white),
-                  softWrap: true,
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Text(
+                    descripcion!,
+                    style: const TextStyle(color: Colors.white),
+                    softWrap: true,
+                  ),
                 ),
               if (ingredientes != null && ingredientes!.trim().isNotEmpty) ...[
                 const SizedBox(height: 12),
@@ -102,6 +137,7 @@ class Tarjeta extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                     color: Colors.white,
+                    fontStyle: FontStyle.italic,
                   ),
                 ),
                 Text(
@@ -118,11 +154,7 @@ class Tarjeta extends StatelessWidget {
                 Wrap(
                   spacing: 8,
                   runSpacing: 6,
-                  children: tags
-                      .map((texto) => Tag(
-                            texto: texto,
-                          ))
-                      .toList(),
+                  children: tags.map((texto) => Tag(texto: texto)).toList(),
                 ),
               ],
             ],
@@ -134,10 +166,10 @@ class Tarjeta extends StatelessWidget {
               child: GestureDetector(
                 onTap: onToggleFavorito,
                 child: Icon(
-                  FavoritosManager().esFavorito(titulo)
+                  FavoritosManager().esFavorito(nombre)
                       ? Icons.star
                       : Icons.star_border,
-                  color: Color(0xFFFFD829),
+                  color: const Color(0xFFFFD829),
                   size: 28,
                 ),
               ),

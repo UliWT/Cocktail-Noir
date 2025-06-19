@@ -19,7 +19,7 @@ void mostrarDetalleTrago(BuildContext context, Map<String, dynamic> trago) {
           controller: scrollController,
           padding: const EdgeInsets.all(16),
           child: Tarjeta(
-            titulo: trago['nombre'],
+            nombre: trago['nombre'],
             descripcion: trago['descripcion'],
             ingredientes: trago['ingredientes'],
             preparacion: trago['preparacion'],

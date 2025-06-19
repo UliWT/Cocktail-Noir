@@ -74,7 +74,7 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
                       itemBuilder: (context, index) {
                         final trago = favoritosFiltrados[index];
                         return Tarjeta(
-                          titulo: trago['nombre'],
+                          nombre: trago['nombre'],
                           descripcion: trago['descripcion'],
                           tags: List<String>.from(trago['tags']),
                           width: double.infinity,

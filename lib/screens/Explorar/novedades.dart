@@ -61,7 +61,7 @@ class _NovedadesScreenState extends State<NovedadesScreen> {
           itemBuilder: (context, index) {
             final novedad = novedades[index];
             return Tarjeta(
-              titulo: novedad['nombre'],
+              nombre: novedad['nombre'],
               descripcion: novedad['descripcion'],
               tags: List<String>.from(novedad['tags']),
               width: double.infinity,
