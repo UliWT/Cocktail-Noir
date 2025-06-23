@@ -10,15 +10,11 @@ class FavoritosManager {
 
   List<Map<String, dynamic>> get favoritos => List.unmodifiable(_favoritos);
 
-  // Ahora esta función no hace nada (era para cargar desde almacenamiento)
   Future<void> cargarFavoritos() async {
-    // Ya no se cargan desde ningún lado
     _favoritos.clear();
   }
 
-  // Esta función también queda vacía
   Future<void> _guardarEnStorage() async {
-    // Ya no se guarda en ningún lado
   }
 
   bool esFavorito(String titulo) {

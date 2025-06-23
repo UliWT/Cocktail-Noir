@@ -1,4 +1,3 @@
-// home.dart
 import 'package:flutter/material.dart';
 import 'Explorar/explorar.dart';
 import 'Preparar/preparar_ya.dart';

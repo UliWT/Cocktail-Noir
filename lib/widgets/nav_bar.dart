@@ -13,12 +13,11 @@ class BottomNavBar extends StatelessWidget {
 @override
 Widget build(BuildContext context) {
   return Column(
-    mainAxisSize: MainAxisSize.min, // Para que no ocupe todo el alto
+    mainAxisSize: MainAxisSize.min,
     children: [
-      // Línea decorativa arriba
       Container(
-        height: 3, // grosor de la línea
-        color: const Color(0xFFD4AF37), // color de la línea (puede ser el dorado)
+        height: 3,
+        color: const Color(0xFFD4AF37),
       ),
 
       Theme(

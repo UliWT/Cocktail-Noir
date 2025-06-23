@@ -4,7 +4,7 @@ import 'package:myapp/widgets/textField.dart';
 import 'package:myapp/widgets/tarjeta.dart';
 import 'package:myapp/favoritos_manager.dart';
 import 'package:myapp/data/tragos.dart' as data;
-import 'package:myapp/widgets/modalSheet.dart';  // Importamos el modalSheet
+import 'package:myapp/widgets/modalSheet.dart';
 
 class PrepararYaScreen extends StatefulWidget {
   const PrepararYaScreen({super.key});

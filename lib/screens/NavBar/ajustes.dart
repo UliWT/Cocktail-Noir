@@ -100,6 +100,7 @@ class _AjustesScreenState extends State<AjustesScreen> {
     );
   }
 
+  // ignore: unused_element
   Widget _buildButton(String text, VoidCallback onPressed) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),

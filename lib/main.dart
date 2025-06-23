@@ -15,7 +15,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Intentamos cargar favoritos (no async porque ya no hace nada)
     try {
       FavoritosManager().cargarFavoritos();
     } catch (e) {
