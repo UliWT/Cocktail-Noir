@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:myapp/widgets/main_scaffold.dart';
 import 'package:myapp/widgets/tarjeta.dart';
 import 'package:myapp/widgets/boton.dart';
-import 'package:myapp/data/tragos.dart'; // <--- ✅ Acá importa tu lista global
+import 'package:myapp/data/tragos.dart';
 
 class SorprendemeScreen extends StatefulWidget {
   const SorprendemeScreen({super.key});

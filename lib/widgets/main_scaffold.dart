@@ -24,7 +24,6 @@ class MainScaffold extends StatelessWidget {
       bottomNavigationBar: BottomNavBar(
         selectedIndex: selectedIndex,
         onItemSelected: (index) {
-          // Navegación según el índice
           switch (index) {
               case 0:
                 Navigator.pushReplacementNamed(context, '/home');

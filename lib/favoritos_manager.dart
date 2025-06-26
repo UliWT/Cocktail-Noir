@@ -1,4 +1,3 @@
-// favoritos_manager.dart
 class FavoritosManager {
   static final FavoritosManager _instancia = FavoritosManager._internal();
 

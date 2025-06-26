@@ -81,7 +81,7 @@ class Ingredientes extends StatelessWidget {
         Boton(
           texto: 'Agregar ingrediente',
           onPressed: onAgregar,
-          padding: const EdgeInsets.symmetric(vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal:20 , vertical: 14),
           borderRadius: 12,
           style: const TextStyle(fontSize: 15),
         ),

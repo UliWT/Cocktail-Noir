@@ -41,27 +41,28 @@ class _BuscarTScreenState extends State<BuscarTScreen> {
       ..._sabores,
     };
 
-    Map<String, dynamic>? mejorTrago;
-    int maxCoincidencias = 0;
-
-    for (var trago in tragos) {
+    final tragosCoincidentes = tragos.where((trago) {
       final tagsTrago = List<String>.from(trago['tags'] ?? []);
       final coincidencias = tagsTrago.where((tag) => tagsElegidos.contains(tag)).length;
+      return coincidencias >= 2;
+    }).toList();
 
-      if (coincidencias > maxCoincidencias) {
-        mejorTrago = trago;
-        maxCoincidencias = coincidencias;
-      }
-    }
+    if (tragosCoincidentes.isNotEmpty) {
+      tragosCoincidentes.shuffle();
+      final tragoElegido = tragosCoincidentes.first;
 
-      if (mejorTrago != null) {mostrarDetalleTrago(context, mejorTrago!, onFavoritoChanged: () => setState(() {}));}
-     else {
+      mostrarDetalleTrago(
+        context,
+        tragoElegido,
+        onFavoritoChanged: () => setState(() {}),
+      );
+    } else {
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
           backgroundColor: const Color(0xFF1A1A1A),
           title: const Text("Sin resultados", style: TextStyle(color: Colors.white)),
-          content: const Text("No se encontró ningún trago con esos criterios.", style: TextStyle(color: Colors.white70)),
+          content: const Text("No se encontró ningún trago con al menos 2 coincidencias.", style: TextStyle(color: Colors.white70)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),

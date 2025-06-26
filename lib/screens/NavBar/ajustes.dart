@@ -18,7 +18,7 @@ class _AjustesScreenState extends State<AjustesScreen> {
   @override
   Widget build(BuildContext context) {
     return MainScaffold(
-      selectedIndex: 1, // ajustá según la posición en tu BottomNavBar
+      selectedIndex: 1,
       backgroundColor: const Color(0xFF1A1A1A),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1A1A),
