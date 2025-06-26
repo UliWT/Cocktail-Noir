@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/widgets/boton.dart';
+import 'package:myapp/widgets/tarjeta.dart';  // Importa tu Tarjeta con Tags
 
 class VPrevia extends StatelessWidget {
   final String nombre;
   final String descripcion;
   final List<String> sabores;
   final List<Map<String, dynamic>> ingredientes;
+  final List<String> pasos;
+  final String decoracion;
+  final VoidCallback onVolver;
 
   const VPrevia({
     super.key,
@@ -12,54 +17,49 @@ class VPrevia extends StatelessWidget {
     required this.descripcion,
     required this.sabores,
     required this.ingredientes,
+    required this.pasos,
+    required this.decoracion,
+    required this.onVolver,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(16),
+    final ingredientesStr = ingredientes
+        .map((e) => '${e['nombre'] ?? ''} (${e['unidad'] ?? ''})')
+        .join('\n');
+    final preparacionStr = pasos.asMap().entries.map((entry) {
+      final idx = entry.key + 1;
+      final paso = entry.value;
+      return '$idx. $paso';
+    }).join('\n');
+
+    return Column(
       children: [
-        Text(
-          nombre,
-          style: const TextStyle(
-            color: Color(0xFFFFD829),
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Tarjeta(
+              nombre: nombre,
+              descripcion: descripcion,
+              ingredientes: ingredientesStr,
+              preparacion: preparacionStr,
+              decoracion: decoracion,
+              tags: sabores,
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+            ),
           ),
         ),
-        const SizedBox(height: 10),
-        Text(
-          descripcion,
-          style: const TextStyle(color: Colors.white, fontSize: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+          child:Boton(
+          texto: 'Crear Trago',
+          onPressed: (){},
+          padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 20),
+          borderRadius: 5,
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 20),
-        const Text(
-          'Sabores:',
-          style: TextStyle(color: Color(0xFFFFD829), fontWeight: FontWeight.bold),
         ),
-        Wrap(
-          spacing: 8,
-          children: sabores.map((sabor) {
-            return Chip(
-              label: Text(sabor),
-              backgroundColor: const Color(0xFFFFD829).withOpacity(0.3),
-              labelStyle: const TextStyle(color: Colors.black),
-            );
-          }).toList(),
-        ),
-        const SizedBox(height: 20),
-        const Text(
-          'Ingredientes:',
-          style: TextStyle(color: Color(0xFFFFD829), fontWeight: FontWeight.bold),
-        ),
-        ...ingredientes.map((ing) {
-          return Text(
-            '${ing['nombre']} - ${ing['unidad']}',
-            style: const TextStyle(color: Colors.white),
-          );
-        }).toList(),
-        const SizedBox(height: 20),
-        // Podrías agregar aquí la preparación y decoración cuando las tengas
       ],
     );
   }

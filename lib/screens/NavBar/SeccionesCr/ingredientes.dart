@@ -1,12 +1,13 @@
+// ingredientes.dart
 import 'package:flutter/material.dart';
 import 'package:myapp/widgets/boton.dart';
 
-class Ingredientes extends StatefulWidget {
+class Ingredientes extends StatelessWidget {
   final List<Map<String, dynamic>> ingredientes;
   final List<String> unidades;
   final List<TextEditingController> ingredienteControllers;
   final VoidCallback onAgregar;
-  final void Function(int) onEliminar;
+  final Function(int) onEliminar;
   final VoidCallback onVolver;
   final VoidCallback onContinuar;
 
@@ -22,17 +23,12 @@ class Ingredientes extends StatefulWidget {
   });
 
   @override
-  State<Ingredientes> createState() => _IngredientesState();
-}
-
-class _IngredientesState extends State<Ingredientes> {
-  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Expanded(
           child: ListView.builder(
-            itemCount: widget.ingredientes.length,
+            itemCount: ingredientes.length,
             itemBuilder: (context, index) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12),
@@ -40,8 +36,9 @@ class _IngredientesState extends State<Ingredientes> {
                   children: [
                     Expanded(
                       child: TextField(
-                        controller: widget.ingredienteControllers[index],
+                        controller: ingredienteControllers[index],
                         style: const TextStyle(color: Colors.white),
+                        onChanged: (value) => ingredientes[index]['nombre'] = value,
                         decoration: InputDecoration(
                           labelText: 'Ingrediente',
                           labelStyle: const TextStyle(color: Color(0xFFFFD829)),
@@ -56,45 +53,34 @@ class _IngredientesState extends State<Ingredientes> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        onChanged: (value) {
-                          widget.ingredientes[index]['nombre'] = value;
-                        },
                       ),
                     ),
                     const SizedBox(width: 10),
                     DropdownButton<String>(
-                      value: widget.ingredientes[index]['unidad'],
+                      value: ingredientes[index]['unidad'],
                       dropdownColor: const Color(0xFF1A1A1A),
                       style: const TextStyle(color: Color(0xFFFFD829)),
                       underline: Container(),
                       iconEnabledColor: const Color(0xFFFFD829),
-                      items: widget.unidades.map((unidad) {
-                        return DropdownMenuItem<String>(
-                          value: unidad,
-                          child: Text(unidad),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          widget.ingredientes[index]['unidad'] = value!;
-                        });
-                      },
+                      items: unidades.map((unidad) => DropdownMenuItem(
+                        value: unidad,
+                        child: Text(unidad),
+                      )).toList(),
+                      onChanged: (value) => ingredientes[index]['unidad'] = value,
                     ),
-                    const SizedBox(width: 5),
                     IconButton(
-                      onPressed: () => widget.onEliminar(index),
                       icon: const Icon(Icons.remove_circle, color: Colors.redAccent),
-                    ),
+                      onPressed: () => onEliminar(index),
+                    )
                   ],
                 ),
               );
             },
           ),
         ),
-        const SizedBox(height: 10),
         Boton(
           texto: 'Agregar ingrediente',
-          onPressed: widget.onAgregar,
+          onPressed: onAgregar,
           padding: const EdgeInsets.symmetric(vertical: 14),
           borderRadius: 12,
           style: const TextStyle(fontSize: 15),
@@ -106,24 +92,24 @@ class _IngredientesState extends State<Ingredientes> {
             Expanded(
               child: Boton(
                 texto: '← Volver',
-                onPressed: widget.onVolver,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                borderRadius: 12,
-                style: const TextStyle(fontSize: 15),
+                onPressed: onVolver,
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                borderRadius: 5,
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(width: 20),
             Expanded(
               child: Boton(
                 texto: 'Preparación →',
-                onPressed: widget.onContinuar,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                borderRadius: 12,
-                style: const TextStyle(fontSize: 15),
+                onPressed: onContinuar,
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                borderRadius: 5,
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
           ],
-        ),
+        )
       ],
     );
   }

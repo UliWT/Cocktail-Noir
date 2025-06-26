@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/widgets/main_scaffold.dart';
 import 'package:myapp/widgets/boton.dart';
+import 'package:myapp/screens/NavBar/SeccionesCr/informacion.dart';
+import 'package:myapp/screens/NavBar/SeccionesCr/ingredientes.dart';
+import 'package:myapp/screens/NavBar/SeccionesCr/preparacion.dart';
+import 'package:myapp/screens/NavBar/SeccionesCr/v_previa.dart';
 
 class CrearScreen extends StatefulWidget {
   const CrearScreen({Key? key}) : super(key: key);
@@ -11,15 +15,81 @@ class CrearScreen extends StatefulWidget {
 
 class _CrearScreenState extends State<CrearScreen> {
   int _seccionActiva = 0;
+
   final TextEditingController _nombreController = TextEditingController();
   final TextEditingController _descripcionController = TextEditingController();
+  final TextEditingController _decoracionController = TextEditingController();
+
   final List<String> saborOpciones = [
     'Dulce', 'Seco', 'Herbaceo', 'Amargo', 'Cremoso', 'Ácido', 'Frutal',
     'Tropical', 'Salado', 'Clásico', 'Ahumado', 'Sedoso', 'Picante', 'Innovador',
     'Refrescante'
   ];
-
   final Set<String> saboresSeleccionados = {};
+
+  final List<Map<String, dynamic>> ingredientes = [
+    {'nombre': '', 'unidad': 'ml'}
+  ];
+  final List<String> unidades = ['ml', 'oz', 'cucharadas', 'pizcas', 'gotas'];
+  final List<TextEditingController> _ingredienteControllers = [
+    TextEditingController()
+  ];
+
+  final List<TextEditingController> _pasosPreparacion = [
+    TextEditingController()
+  ];
+
+  void _agregarIngrediente() {
+    setState(() {
+      ingredientes.add({'nombre': '', 'unidad': 'ml'});
+      _ingredienteControllers.add(TextEditingController());
+    });
+  }
+
+  void _eliminarIngrediente(int index) {
+    setState(() {
+      ingredientes.removeAt(index);
+      _ingredienteControllers[index].dispose();
+      _ingredienteControllers.removeAt(index);
+    });
+  }
+
+  void _toggleSabor(String sabor) {
+    setState(() {
+      if (saboresSeleccionados.contains(sabor)) {
+        saboresSeleccionados.remove(sabor);
+      } else {
+        saboresSeleccionados.add(sabor);
+      }
+    });
+  }
+
+  void _agregarPaso() {
+    setState(() {
+      _pasosPreparacion.add(TextEditingController());
+    });
+  }
+
+  void _eliminarPaso(int index) {
+    setState(() {
+      _pasosPreparacion[index].dispose();
+      _pasosPreparacion.removeAt(index);
+    });
+  }
+
+  @override
+  void dispose() {
+    _nombreController.dispose();
+    _descripcionController.dispose();
+    _decoracionController.dispose();
+    for (var c in _ingredienteControllers) {
+      c.dispose();
+    }
+    for (var p in _pasosPreparacion) {
+      p.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,103 +161,46 @@ class _CrearScreenState extends State<CrearScreen> {
   Widget _construirSeccion() {
     switch (_seccionActiva) {
       case 0:
-        return _seccionInformacion();
+        return Informacion(
+          nombreController: _nombreController,
+          descripcionController: _descripcionController,
+          saborOpciones: saborOpciones,
+          saboresSeleccionados: saboresSeleccionados,
+          onToggleSabor: _toggleSabor,
+          onContinuar: () => setState(() => _seccionActiva = 1),
+        );
       case 1:
-        return const Center(
-          child: Text('Ingredientes - en construcción', style: TextStyle(color: Colors.white)),
+        return Ingredientes(
+          ingredientes: ingredientes,
+          unidades: unidades,
+          ingredienteControllers: _ingredienteControllers,
+          onAgregar: _agregarIngrediente,
+          onEliminar: _eliminarIngrediente,
+          onVolver: () => setState(() => _seccionActiva = 0),
+          onContinuar: () => setState(() => _seccionActiva = 2),
         );
       case 2:
-        return const Center(
-          child: Text('Preparación - en construcción', style: TextStyle(color: Colors.white)),
+        return Preparacion(
+          pasos: _pasosPreparacion,
+          decoracionController: _decoracionController,
+          onAgregarPaso: _agregarPaso,
+          onEliminarPaso: _eliminarPaso,
+          onVolver: () => setState(() => _seccionActiva = 1),
+          onContinuar: () => setState(() => _seccionActiva = 3),
         );
-      case 3:
-        return const Center(
-          child: Text('Vista previa - en construcción', style: TextStyle(color: Colors.white)),
-        );
+        case 3:
+          return VPrevia(
+            nombre: _nombreController.text,
+            descripcion: _descripcionController.text,
+            sabores: saboresSeleccionados.toList(),
+            ingredientes: ingredientes,
+            pasos: _pasosPreparacion.map((c) => c.text).toList(),
+            decoracion: _decoracionController.text,
+            onVolver: () => setState(() => _seccionActiva = 2),
+          );
+
       default:
         return const SizedBox.shrink();
     }
-  }
-
-  Widget _seccionInformacion() {
-    return ListView(
-      children: [
-        TextField(
-          controller: _nombreController,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: 'Nombre del trago',
-            labelStyle: const TextStyle(color: Color(0xFFFFD829)),
-            fillColor: const Color(0xFF303030),
-            filled: true,
-            enabledBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: Color(0xFFFFD829)),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: Color(0xFFFFD829), width: 2),
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        TextField(
-          controller: _descripcionController,
-          style: const TextStyle(color: Colors.white),
-          maxLines: 3,
-          decoration: InputDecoration(
-            labelText: 'Descripción',
-            labelStyle: const TextStyle(color: Color(0xFFFFD829)),
-            fillColor: const Color(0xFF303030),
-            filled: true,
-            enabledBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: Color(0xFFFFD829)),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: Color(0xFFFFD829), width: 2),
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        ),
-        const SizedBox(height: 20),
-        const Text(
-          'Seleccioná los sabores:',
-          style: TextStyle(color: Color(0xFFFFD829), fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 10),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: saborOpciones.map((sabor) {
-            final bool seleccionado = saboresSeleccionados.contains(sabor);
-            return Boton(
-              texto: sabor,
-              seleccionado: seleccionado,
-              onPressed: () {
-                setState(() {
-                  if (seleccionado) {
-                    saboresSeleccionados.remove(sabor);
-                  } else {
-                    saboresSeleccionados.add(sabor);
-                  }
-                });
-              },
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              borderRadius: 10,
-              style: const TextStyle(fontSize: 14),
-            );
-          }).toList(),
-        ),
-        const SizedBox(height: 30),
-        Boton(
-          texto: 'Continuar a ingredientes',
-          onPressed: () => setState(() => _seccionActiva = 1),
-          padding: const EdgeInsets.symmetric(vertical: 18),
-          borderRadius: 5,
-          style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-        ),
-      ],
-    );
   }
 }
