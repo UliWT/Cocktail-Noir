@@ -12,7 +12,7 @@ class ExplorarScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MainScaffold(
-      selectedIndex: 0, // o el índice que uses para esta pantalla
+      selectedIndex: 0,
       appBar: AppBar(
         title: const Text('Explorar'),
         backgroundColor: const Color(0xFF1A1A1A),

@@ -1,5 +1,3 @@
-// lib/data/tragos.dart
-
 final List<Map<String, dynamic>> tragos = [
   {
     'nombre': 'Espresso Martini',
