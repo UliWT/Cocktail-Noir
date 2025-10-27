@@ -17,7 +17,7 @@ class Boton extends StatelessWidget {
     this.borderRadius,
     this.style,
     this.emoji,
-    this.seleccionado = false,  // por defecto false
+    this.seleccionado = false,
   });
 
   @override

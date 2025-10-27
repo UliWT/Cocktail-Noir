@@ -17,7 +17,7 @@ void mostrarDetalleTrago(BuildContext context, Map<String, dynamic> trago, {requ
             expand: false,
             initialChildSize: 0.7,
             minChildSize: 0.4,
-            maxChildSize: 0.95,
+            maxChildSize: 0.7,
             builder: (context, scrollController) {
               return Container(
                 decoration: BoxDecoration(

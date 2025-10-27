@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/widgets/boton.dart';
-import 'package:myapp/widgets/tarjeta.dart';  // Importa tu Tarjeta con Tags
+import 'package:myapp/widgets/tarjeta.dart';  
 
 class VPrevia extends StatelessWidget {
   final String nombre;
