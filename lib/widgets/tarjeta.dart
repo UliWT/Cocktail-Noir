@@ -43,18 +43,35 @@ class Tarjeta extends StatelessWidget {
     EdgeInsetsGeometry? padding,
     VoidCallback? onToggleFavorito,
   }) {
+    // Normalizar tags que pueden venir como String (comma-separated) o List
+    List<String> _parseTags(dynamic raw) {
+      if (raw == null) return <String>[];
+      if (raw is List) return raw.map((e) => e.toString()).toList();
+      if (raw is String) {
+        return raw
+            .split(',')
+            .map((s) => s.trim())
+            .where((s) => s.isNotEmpty)
+            .toList();
+      }
+      return [raw.toString()];
+    }
+
+    // Normalizar ingredientes que pueden venir como List o String
+    String? _parseIngredientes(dynamic raw) {
+      if (raw == null) return null;
+      if (raw is List) return raw.map((e) => e.toString()).join('\n');
+      return raw.toString();
+    }
+
     return Tarjeta(
       key: key,
       nombre: trago['nombre'] ?? '',
       descripcion: trago['descripcion'],
-      ingredientes: trago['ingredientes'] is List<String>
-          ? (trago['ingredientes'] as List<String>).join('\n')
-          : trago['ingredientes']?.toString(),
+      ingredientes: _parseIngredientes(trago['ingredientes']),
       preparacion: trago['preparacion'],
       decoracion: trago['decoracion'],
-      tags: trago['tags'] != null
-          ? List<String>.from(trago['tags'])
-          : <String>[],
+      tags: _parseTags(trago['tags']),
       width: width,
       height: height,
       padding: padding,

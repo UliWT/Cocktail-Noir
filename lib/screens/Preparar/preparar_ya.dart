@@ -3,7 +3,7 @@ import 'package:myapp/widgets/main_scaffold.dart';
 import 'package:myapp/widgets/textField.dart';
 import 'package:myapp/widgets/tarjeta.dart';
 import 'package:myapp/favoritos_manager.dart';
-import 'package:myapp/data/tragos.dart' as data;
+import 'package:myapp/data/db_helper.dart';
 import 'package:myapp/widgets/modalSheet.dart';
 
 class PrepararYaScreen extends StatefulWidget {
@@ -16,6 +16,39 @@ class PrepararYaScreen extends StatefulWidget {
 class _PrepararYaScreenState extends State<PrepararYaScreen> {
   final TextEditingController _controller = TextEditingController();
   String _busqueda = '';
+  List<Map<String, dynamic>> _tragos = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarTragos();
+  }
+
+  Future<void> _cargarTragos() async {
+    try {
+      print('Iniciando carga de tragos...');
+      // Dump DB info for debugging
+      await DBHelper().debugDump();
+
+      final dbTragos = await DBHelper().getAllTragos();
+      print('Tragos cargados: ${dbTragos.length}');
+      setState(() {
+        _tragos = dbTragos;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Error al cargar tragos: $e');
+      setState(() {
+        _isLoading = false;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error cargando tragos: $e')),
+        );
+      }
+    }
+  }
 
   void _realizarBusqueda() {
     setState(() {
@@ -28,14 +61,14 @@ class _PrepararYaScreenState extends State<PrepararYaScreen> {
       context,
       trago,
       onFavoritoChanged: () {
-        setState(() {}); // Solo refrescamos la pantalla para actualizar la estrella fuera del modal
+        setState(() {}); // refresca la pantalla para actualizar la estrella
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final tragosFiltrados = data.tragos.where((trago) {
+    final tragosFiltrados = _tragos.where((trago) {
       return trago['nombre'].toLowerCase().contains(_busqueda.toLowerCase());
     }).toList();
 
@@ -60,34 +93,40 @@ class _PrepararYaScreenState extends State<PrepararYaScreen> {
             ),
             const SizedBox(height: 12),
             Expanded(
-              child: tragosFiltrados.isEmpty
+              child: _isLoading
                   ? const Center(
-                      child: Text(
-                        'No se encontraron tragos.',
-                        style: TextStyle(color: Colors.white70),
-                      ),
+                      child: CircularProgressIndicator(color: Colors.yellow),
                     )
-                  : ListView.builder(
-                      itemCount: tragosFiltrados.length,
-                      itemBuilder: (context, index) {
-                        final tragoActual = tragosFiltrados[index];
-                        return GestureDetector(
-                          onTap: () => _mostrarDetalle(context, tragoActual),
-                          child: Tarjeta(
-                            nombre: tragoActual['nombre'],
-                            descripcion: tragoActual['descripcion'],
-                            tags: List<String>.from(tragoActual['tags']),
-                            width: double.infinity,
-                            trago: tragoActual,
-                            onToggleFavorito: () {
-                              setState(() {
-                                FavoritosManager().toggleFavorito(tragoActual);
-                              });
-                            },
+                  : tragosFiltrados.isEmpty
+                      ? const Center(
+                          child: Text(
+                            'No se encontraron tragos.',
+                            style: TextStyle(color: Colors.white70),
                           ),
-                        );
-                      },
-                    ),
+                        )
+                      : ListView.builder(
+                          itemCount: tragosFiltrados.length,
+                          itemBuilder: (context, index) {
+                            final tragoActual = tragosFiltrados[index];
+                            return GestureDetector(
+                              onTap: () => _mostrarDetalle(context, tragoActual),
+                              child: Tarjeta(
+                                nombre: tragoActual['nombre'],
+                                descripcion: tragoActual['descripcion'],
+                                tags: (tragoActual['tags'] != null)
+                                    ? List<String>.from(tragoActual['tags'].split(',')) // convierte el string a lista
+                                    : [],
+                                width: double.infinity,
+                                trago: tragoActual,
+                                onToggleFavorito: () {
+                                  setState(() {
+                                    FavoritosManager().toggleFavorito(tragoActual);
+                                  });
+                                },
+                              ),
+                            );
+                          },
+                        ),
             ),
           ],
         ),
