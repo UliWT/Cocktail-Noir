@@ -3,8 +3,9 @@ import 'package:myapp/widgets/main_scaffold.dart';
 import 'package:myapp/widgets/textField.dart';
 import 'package:myapp/widgets/boton.dart';
 import 'package:myapp/widgets/tarjeta.dart';
-import 'package:myapp/data/tragos.dart';
+import 'package:myapp/data/db_helper.dart';
 import 'package:myapp/widgets/modalSheet.dart';
+import 'package:myapp/mi_bar_manager.dart';
 
 class PIngScreen extends StatefulWidget {
   const PIngScreen({super.key});
@@ -16,6 +17,29 @@ class PIngScreen extends StatefulWidget {
 class _PIngScreenState extends State<PIngScreen> {
   final TextEditingController _controller = TextEditingController();
   final List<String> _ingredientesSeleccionados = [];
+  List<Map<String, dynamic>> _todosTragos = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarTragos();
+  }
+
+  Future<void> _cargarTragos() async {
+    try {
+      final dbTragos = await DBHelper().getAllTragos();
+      setState(() {
+        _todosTragos = dbTragos;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Error cargando tragos en p_ing: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   String normalizar(String texto) {
     return texto
@@ -44,42 +68,81 @@ class _PIngScreenState extends State<PIngScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ingredientesUsuario = _ingredientesSeleccionados.map(normalizar).toSet();
+    
 
-    final List<Map<String, dynamic>> tragosPosibles = _ingredientesSeleccionados.isEmpty
-        ? []
-        : tragos.where((trago) {
-            final ingredientesTrago = (trago['ingredientes'] as String)
-                .split('\n')
-                .map(normalizar)
-                .toList();
+    // Ingredientes disponibles: lo que seleccionó el usuario en MiBar + lo que agregó manualmente
+    final miBarDisponibles = MiBarManager().getAllSelectedIngredients().map(normalizar).toSet();
+    final userAdded = _ingredientesSeleccionados.map(normalizar).toSet();
+    final availableSet = {...miBarDisponibles, ...userAdded};
 
-            return _ingredientesSeleccionados.every((ing) {
-              final ingNorm = normalizar(ing);
-              return ingredientesTrago.any((i) => i.contains(ingNorm));
-            });
-          }).toList();
+    // Ingredientes para filtrar (lo que el usuario buscó explícitamente)
+    final filterTerms = _ingredientesSeleccionados.map(normalizar).toList();
 
-    final List<Map<String, dynamic>> tragosFaltantes = _ingredientesSeleccionados.isEmpty
-        ? []
-        : tragos.where((trago) {
-            final ingredientesTrago = (trago['ingredientes'] as String)
-                .split('\n')
-                .map(normalizar)
-                .toList();
+    // Si no hay términos de filtro y tampoco hay items en MiBar, no mostrar resultados
+    if (filterTerms.isEmpty && miBarDisponibles.isEmpty) {
+      return MainScaffold(
+        selectedIndex: 0,
+        appBar: AppBar(
+          title: const Text('Buscar por Ingrediente'),
+          backgroundColor: const Color(0xFF1A1A1A),
+        ),
+        backgroundColor: const Color(0xFF1A1A1A),
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              BarraBusqueda(
+                controller: _controller,
+                onBuscar: _agregarIngrediente,
+              ),
+              const SizedBox(height: 12),
+              const Center(child: Text('Agregá ingredientes o marcá lo que tenés en Mi Bar')),
+            ],
+          ),
+        ),
+      );
+    }
 
-            final tieneAlgunos = _ingredientesSeleccionados.any((ing) {
-              final ingNorm = normalizar(ing);
-              return ingredientesTrago.any((i) => i.contains(ingNorm));
-            });
+    final List<Map<String, dynamic>> candidatos = _todosTragos.where((trago) {
+      final ingredientesTrago = (trago['ingredientes'] as String)
+          .split('\n')
+          .map(normalizar)
+          .toList();
 
-            final leFaltan = !_ingredientesSeleccionados.every((ing) {
-              final ingNorm = normalizar(ing);
-              return ingredientesTrago.any((i) => i.contains(ingNorm));
-            });
+      // El trago es candidato si contiene todos los términos de filtro (si hay)
+      if (filterTerms.isNotEmpty) {
+        return filterTerms.every((term) => ingredientesTrago.any((i) => i.contains(term)));
+      }
+      // Si no hay filtro explícito, considerar todos los tragos
+      return true;
+    }).toList();
 
-            return tieneAlgunos && leFaltan;
-          }).toList();
+    final tragosPosibles = <Map<String, dynamic>>[];
+    final tragosFaltantes = <Map<String, dynamic>>[];
+
+    for (var trago in candidatos) {
+      final ingredientesTrago = (trago['ingredientes'] as String)
+          .split('\n')
+          .map(normalizar)
+          .toList();
+
+      // verificar si todos los ingredientes del trago están cubiertos por availableSet
+      final missing = <String>[];
+      for (var ingr in ingredientesTrago) {
+        final matched = availableSet.any((a) => ingr.contains(a) || a.contains(ingr));
+        if (!matched) missing.add(ingr);
+      }
+
+      if (missing.isEmpty) {
+        tragosPosibles.add(trago);
+      } else {
+        // marcar solo si el trago contiene alguno de los términos de filtro (para relevancia)
+        final tieneAlgunoFiltro = filterTerms.isEmpty
+            ? true
+            : filterTerms.any((term) => ingredientesTrago.any((i) => i.contains(term)));
+        if (tieneAlgunoFiltro) tragosFaltantes.add(trago);
+      }
+    }
 
     return MainScaffold(
       selectedIndex: 0,
@@ -88,7 +151,11 @@ class _PIngScreenState extends State<PIngScreen> {
         backgroundColor: const Color(0xFF1A1A1A),
       ),
       backgroundColor: const Color(0xFF1A1A1A),
-      body: Padding(
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(color: Colors.yellow),
+            )
+          : Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
@@ -119,7 +186,7 @@ class _PIngScreenState extends State<PIngScreen> {
             Expanded(
               child: ListView(
                 children: [
-                  if (_ingredientesSeleccionados.isNotEmpty) ...[
+                  if (_ingredientesSeleccionados.isNotEmpty || MiBarManager().getAllSelectedIngredients().isNotEmpty) ...[
                     Text(
                       'Tragos posibles:',
                       style: TextStyle(
@@ -133,7 +200,7 @@ class _PIngScreenState extends State<PIngScreen> {
                       Text('No se encontraron tragos.', style: TextStyle(color: Colors.grey.shade400))
                     else
                       ...tragosPosibles.map((trago) => GestureDetector(
-                            onTap: () => mostrarDetalleTrago(context, trago, onFavoritoChanged: () {  }),
+                            onTap: () => mostrarDetalleTrago(context, trago, onFavoritoChanged: () => setState(() {})),
                             child: Tarjeta(
                               nombre: trago['nombre'] as String,
                               descripcion: trago['descripcion'] as String?,
@@ -165,7 +232,7 @@ class _PIngScreenState extends State<PIngScreen> {
                         }).toList();
 
                         return GestureDetector(
-                          onTap: () => mostrarDetalleTrago(context, trago, onFavoritoChanged: () {  }),
+                          onTap: () => mostrarDetalleTrago(context, trago, onFavoritoChanged: () => setState(() {})),
                           child: Tarjeta(
                             nombre: trago['nombre'] as String,
                             descripcion:

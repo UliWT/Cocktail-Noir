@@ -7,6 +7,7 @@ import 'package:myapp/screens/NavBar/mi_bar.dart';
 import 'package:myapp/favoritos_manager.dart';
 
 void main() {
+  FavoritosManager().cargarFavoritos();
   runApp(const MyApp());
 }
 
@@ -15,12 +16,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    try {
-      FavoritosManager().cargarFavoritos();
-    } catch (e) {
-      debugPrint('Error cargando favoritos: $e');
-    }
-
     return MaterialApp(
       title: 'Cocktail Noir',
       debugShowCheckedModeBanner: false,

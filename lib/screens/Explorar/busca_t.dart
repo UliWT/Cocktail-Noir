@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/widgets/main_scaffold.dart';
 import 'package:myapp/widgets/boton.dart';
-import 'package:myapp/data/tragos.dart';
+import 'package:myapp/data/db_helper.dart';
 import 'package:myapp/widgets/modalSheet.dart';
 
 typedef Tag = String;
@@ -17,6 +17,29 @@ class _BuscarTScreenState extends State<BuscarTScreen> {
   String? _alcohol;
   String? _intensidad;
   final Set<Tag> _sabores = {};
+  List<Map<String, dynamic>> _todosTragos = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarTragos();
+  }
+
+  Future<void> _cargarTragos() async {
+    try {
+      final dbTragos = await DBHelper().getAllTragos();
+      setState(() {
+        _todosTragos = dbTragos;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Error cargando tragos en busca_t: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   final List<Tag> saborOpciones = [
     'Dulce', 'Seco', 'Herbaceo', 'Amargo', 'Cremoso', 'Ácido', 'Frutal',
@@ -35,14 +58,34 @@ class _BuscarTScreenState extends State<BuscarTScreen> {
   }
 
   void _buscarTragoIdeal() {
+    if (_isLoading || _todosTragos.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          backgroundColor: const Color(0xFF1A1A1A),
+          title: const Text("Cargando", style: TextStyle(color: Colors.white)),
+          content: const Text("Aún se están cargando los tragos.", style: TextStyle(color: Colors.white70)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Aceptar", style: TextStyle(color: Color(0xFFFFCD29))),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
     final tagsElegidos = {
       if (_alcohol != null) _alcohol!,
       if (_intensidad != null) _intensidad!,
       ..._sabores,
     };
 
-    final tragosCoincidentes = tragos.where((trago) {
-      final tagsTrago = List<String>.from(trago['tags'] ?? []);
+    final tragosCoincidentes = _todosTragos.where((trago) {
+      final tagsTrago = (trago['tags'] is String)
+          ? (trago['tags'] as String).split(',').map((s) => s.trim()).toList()
+          : List<String>.from(trago['tags'] ?? []);
       final coincidencias = tagsTrago.where((tag) => tagsElegidos.contains(tag)).length;
       return coincidencias >= 2;
     }).toList();
@@ -88,7 +131,11 @@ class _BuscarTScreenState extends State<BuscarTScreen> {
         title: const Text(''),
       ),
       backgroundColor: const Color(0xFF1A1A1A),
-      body: ListView(
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(color: Colors.yellow),
+            )
+          : ListView(
         padding: const EdgeInsets.all(20),
         children: [
           // Alcohol

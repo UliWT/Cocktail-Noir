@@ -25,14 +25,36 @@ class MiBarManager {
     return _seleccionados[categoria]?.contains(item) ?? false;
   }
 
+  // Selecciona todos los items de una categoría o los deselecciona si ya estaban todos seleccionados
+  void toggleSeleccionCategoria(String categoria, Iterable<String> items) {
+    final set = _seleccionados.putIfAbsent(categoria, () => <String>{});
+    final allSelected = items.every((i) => set.contains(i));
+    if (allSelected) {
+      // deseleccionar todos
+      for (var i in items) set.remove(i);
+    } else {
+      // seleccionar todos
+      for (var i in items) set.add(i);
+    }
+  }
+
+  bool isCategoriaAllSelected(String categoria, Iterable<String> items) {
+    return items.isNotEmpty && items.every((i) => _seleccionados[categoria]?.contains(i) ?? false);
+  }
+
   Map<String, Set<String>> obtenerSeleccionados() => _seleccionados;
 
-  // Método para obtener todos los ingredientes seleccionados como lista plana
+  // Método para obtener todos los ingredientes seleccionados como lista plana.
+  // Si una categoría tiene elementos seleccionados, también se incluye el nombre
+  // de la categoría (por ejemplo, seleccionar tipos de Ron también aporta "Ron").
   List<String> getAllSelectedIngredients() {
     final all = <String>{};
-    for (var set in _seleccionados.values) {
-      all.addAll(set);
-    }
+    _seleccionados.forEach((categoria, set) {
+      if (set.isNotEmpty) {
+        all.add(categoria);
+        all.addAll(set);
+      }
+    });
     return all.toList();
   }
 }

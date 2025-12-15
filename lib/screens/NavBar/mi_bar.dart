@@ -87,7 +87,23 @@ final Map<String, List<String>> categorias = {
                   ),
                 ),
               ),
-              trailing: const SizedBox.shrink(),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      MiBarManager().isCategoriaAllSelected(categoria, items)
+                          ? Icons.check_box
+                          : Icons.check_box_outline_blank,
+                      color: MiBarManager().isCategoriaAllSelected(categoria, items)
+                          ? const Color(0xFFD4AF37)
+                          : const Color(0xFF4C4C4C),
+                    ),
+                    onPressed: () => setState(() => MiBarManager().toggleSeleccionCategoria(categoria, items)),
+                    tooltip: 'Seleccionar/Deseleccionar todo',
+                  ),
+                ],
+              ),
               children: [
                 Wrap(
                   spacing: 8,
