@@ -5,6 +5,7 @@ import 'package:myapp/screens/NavBar/crear.dart';
 import 'package:myapp/screens/NavBar/favoritos.dart';
 import 'package:myapp/screens/NavBar/mi_bar.dart';
 import 'package:myapp/favoritos_manager.dart';
+import 'package:myapp/mi_bar_manager.dart';
 
 void main() async {
   // Garantiza que los plugins (como SharedPreferences) funcionen antes del runApp
@@ -12,6 +13,7 @@ void main() async {
   
   // Espera a que se carguen los datos del disco
   await FavoritosManager().cargarFavoritos();
+  await MiBarManager().cargarSeleccion();
   
   runApp(const MyApp());
 }

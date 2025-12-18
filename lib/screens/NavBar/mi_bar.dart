@@ -11,50 +11,56 @@ class MiBarScreen extends StatefulWidget {
 }
 
 class _MiBarScreenState extends State<MiBarScreen> {
-final Map<String, List<String>> categorias = {
-  'Ron': ['Blanco', 'Dorado', 'Añejo', 'Overproof'],
-  'Tequila': ['Blanco', 'Reposado', 'Añejo'],
-  'Whisky': ['Scotch', 'Bourbon', 'Rye', 'Irlandés'],
-  'Vodka': ['Clásico', 'Saborizado'],
-  'Ginebra': ['London Dry', 'Old Tom', 'Pink Gin'],
-  'Vermouth': ['Blanco', 'Rosso', 'Seco'],
-  'Licor': ['Triple Sec', 'Amaretto', 'Baileys', 'Kahlúa', 'Chocolate'],
-  'Aperitivo': ['Campari', 'Aperol', 'Fernet'],
-  'Brandy': ['Cognac', 'Armagnac'],
-  'Bitters': ['Angostura', 'Chocolate'],
-  'Gaseosas': ['Coca Cola', 'Sprite', 'Fanta'],
-  'Frutas': ['Frutilla', 'Durazno', 'Manzana', 'Pera', 'Cereza', 'Frambuesa'],
-  'Ingredientes básicos': [
-    'Lima',
-    'Limón',
-    'Jugo de lima',
-    'Jugo de limón',
-    'Rodaja de lima',
-    'Azúcar',
-    'Almíbar',
-    'Hielo',
-    'Soda',
-    'Agua',
-    'Jarabe simple'
-  ],
-};
-
+  final Map<String, List<String>> categorias = {
+    'Ron': ['Blanco', 'Dorado', 'Añejo', 'Overproof'],
+    'Tequila': ['Blanco', 'Reposado', 'Añejo'],
+    'Whisky': ['Scotch', 'Bourbon', 'Rye', 'Irlandés'],
+    'Vodka': ['Clásico', 'Saborizado'],
+    'Ginebra': ['London Dry', 'Old Tom', 'Pink Gin'],
+    'Vermouth': ['Blanco', 'Rosso', 'Seco'],
+    'Licor': ['Triple Sec', 'Amaretto', 'Baileys', 'Kahlúa', 'Chocolate'],
+    'Aperitivo': ['Campari', 'Aperol', 'Fernet'],
+    'Brandy': ['Cognac', 'Armagnac'],
+    'Bitters': ['Angostura', 'Chocolate'],
+    'Gaseosas': ['Coca Cola', 'Sprite', 'Fanta'],
+    'Frutas': ['Frutilla', 'Durazno', 'Manzana', 'Pera', 'Cereza', 'Frambuesa'],
+    'Ingredientes básicos': [
+      'Lima',
+      'Limón',
+      'Jugo de lima',
+      'Jugo de limón',
+      'Rodaja de lima',
+      'Azúcar',
+      'Almíbar',
+      'Hielo',
+      'Soda',
+      'Agua',
+      'Jarabe simple'
+    ],
+  };
 
   final Set<String> desplegados = {};
 
   @override
   void initState() {
     super.initState();
+    // Inicializamos las categorías en el Manager
     MiBarManager().inicializarCategorias(categorias.keys);
   }
 
-  void toggleSeleccion(String categoria, String item) {
-    setState(() {
-      MiBarManager().toggleSeleccion(categoria, item);
-    });
+  // --- CORRECCIÓN: Funciones asíncronas fuera del setState ---
+
+  Future<void> _toggleSeleccion(String categoria, String item) async {
+    await MiBarManager().toggleSeleccion(categoria, item);
+    if (mounted) setState(() {});
   }
 
-  void toggleDesplegado(String categoria, bool expanded) {
+  Future<void> _toggleSeleccionCategoria(String categoria, List<String> items) async {
+    await MiBarManager().toggleSeleccionCategoria(categoria, items);
+    if (mounted) setState(() {});
+  }
+
+  void _toggleDesplegado(String categoria, bool expanded) {
     setState(() {
       if (expanded) {
         desplegados.add(categoria);
@@ -66,6 +72,8 @@ final Map<String, List<String>> categorias = {
 
   @override
   Widget build(BuildContext context) {
+    final manager = MiBarManager();
+
     return MainScaffold(
       selectedIndex: 3,
       appBar: AppBar(title: const Text("Mi Bar")),
@@ -76,6 +84,7 @@ final Map<String, List<String>> categorias = {
           final categoria = entry.key;
           final items = entry.value;
           final expandido = desplegados.contains(categoria);
+          final allSelected = manager.isCategoriaAllSelected(categoria, items);
 
           return Container(
             margin: const EdgeInsets.only(bottom: 25),
@@ -88,7 +97,7 @@ final Map<String, List<String>> categorias = {
               ),
             ),
             child: ExpansionTile(
-              onExpansionChanged: (val) => toggleDesplegado(categoria, val),
+              onExpansionChanged: (val) => _toggleDesplegado(categoria, val),
               tilePadding: const EdgeInsets.symmetric(horizontal: 16),
               title: Center(
                 child: Text(
@@ -100,39 +109,33 @@ final Map<String, List<String>> categorias = {
                   ),
                 ),
               ),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: Icon(
-                      MiBarManager().isCategoriaAllSelected(categoria, items)
-                          ? Icons.check_box
-                          : Icons.check_box_outline_blank,
-                      color: MiBarManager().isCategoriaAllSelected(categoria, items)
-                          ? const Color(0xFFD4AF37)
-                          : const Color(0xFF4C4C4C),
-                    ),
-                    onPressed: () => setState(() => MiBarManager().toggleSeleccionCategoria(categoria, items)),
-                    tooltip: 'Seleccionar/Deseleccionar todo',
-                  ),
-                ],
+              trailing: IconButton(
+                icon: Icon(
+                  allSelected ? Icons.check_box : Icons.check_box_outline_blank,
+                  color: allSelected ? const Color(0xFF4C4C4C) : const Color(0xFFD4AF37),
+                ),
+                onPressed: () => _toggleSeleccionCategoria(categoria, items),
+                tooltip: 'Seleccionar/Deseleccionar todo',
               ),
               children: [
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: items.map((item) {
-                    final seleccionado = MiBarManager().esSeleccionado(categoria, item);
-                    return Boton(
-                      texto: item,
-                      seleccionado: seleccionado,
-                      onPressed: () => toggleSeleccion(categoria, item),
-                      style: const TextStyle(fontSize: 14),
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                      borderRadius: 20,
-                      key: ValueKey('$categoria-$item-$seleccionado'),
-                    );
-                  }).toList(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: items.map((item) {
+                      final seleccionado = manager.esSeleccionado(categoria, item);
+                      return Boton(
+                        texto: item,
+                        seleccionado: seleccionado,
+                        onPressed: () => _toggleSeleccion(categoria, item),
+                        style: const TextStyle(fontSize: 14),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        borderRadius: 20,
+                        key: ValueKey('$categoria-$item-$seleccionado'),
+                      );
+                    }).toList(),
+                  ),
                 ),
                 const SizedBox(height: 16),
               ],
