@@ -1,13 +1,15 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:myapp/utils/normalizer.dart'; // Asegurate de que la ruta sea correcta
 
 class MiBarManager {
   static final MiBarManager _instancia = MiBarManager._interno();
-  // El mapa donde guardamos Categoría -> Set de Ingredientes
   final Map<String, Set<String>> _seleccionados = {};
 
   factory MiBarManager() => _instancia;
   MiBarManager._interno();
+
+  // --- PERSISTENCIA ---
 
   Future<void> cargarSeleccion() async {
     try {
@@ -17,9 +19,7 @@ class MiBarManager {
       if (jsonData != null) {
         final Map<String, dynamic> decoded = jsonDecode(jsonData);
         _seleccionados.clear();
-        
         decoded.forEach((categoria, items) {
-          // Convertimos la lista que viene del JSON de nuevo a un Set
           _seleccionados[categoria] = Set<String>.from(items);
         });
       }
@@ -31,7 +31,6 @@ class MiBarManager {
   Future<void> _guardarEnStorage() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      // Convertimos los Sets a Listas para que jsonEncode no falle
       final Map<String, List<String>> paraGuardar = _seleccionados.map(
         (key, value) => MapEntry(key, value.toList()),
       );
@@ -41,11 +40,12 @@ class MiBarManager {
     }
   }
 
+  // --- LÓGICA DE SELECCIÓN ---
+
   void inicializarCategorias(Iterable<String> categorias) {
     for (var cat in categorias) {
       _seleccionados.putIfAbsent(cat, () => <String>{});
     }
-    // No guardamos acá porque es solo inicialización de estructura
   }
 
   Future<void> toggleSeleccion(String categoria, String item) async {
@@ -55,13 +55,12 @@ class MiBarManager {
     } else {
       set.add(item);
     }
-    await _guardarEnStorage(); // Guardamos el cambio
+    await _guardarEnStorage();
   }
 
   Future<void> toggleSeleccionCategoria(String categoria, Iterable<String> items) async {
     final set = _seleccionados.putIfAbsent(categoria, () => <String>{});
     final allSelected = items.every((i) => set.contains(i));
-    
     if (allSelected) {
       for (var i in items) set.remove(i);
     } else {
@@ -69,6 +68,8 @@ class MiBarManager {
     }
     await _guardarEnStorage();
   }
+
+  // --- CONSULTAS ---
 
   bool esSeleccionado(String categoria, String item) {
     return _seleccionados[categoria]?.contains(item) ?? false;
@@ -78,27 +79,30 @@ class MiBarManager {
     return items.isNotEmpty && items.every((i) => _seleccionados[categoria]?.contains(i) ?? false);
   }
 
-  Map<String, Set<String>> obtenerSeleccionados() => _seleccionados;
-
+  /// ESTA ES LA FUNCIÓN CLAVE PARA EL BUSCADOR
   List<String> getAllSelectedIngredients() {
-    final all = <String>{};
-    _seleccionados.forEach((categoria, set) {
-      if (set.isNotEmpty) {
-        all.add(categoria);
-        all.addAll(set);
+    final allRawStrings = <String>{};
+
+    _seleccionados.forEach((categoria, itemsSet) {
+      if (itemsSet.isNotEmpty) {
+        // 1. Agregamos la categoría sola (ej: "Ron")
+        allRawStrings.add(categoria);
+
+        for (var item in itemsSet) {
+          // 2. Agregamos el item solo (ej: "Blanco")
+          allRawStrings.add(item);
+          
+          // 3. Agregamos la combinación (ej: "Ron Blanco")
+          // Esto es lo que hace que el Daiquiri funcione
+          allRawStrings.add("$categoria $item");
+        }
       }
     });
-    try {
-      final normalizer = (String s) => s
-          .toLowerCase()
-          .replaceAll(RegExp(r'[\n\t\\/,_\-()\[\].:]'), ' ')
-          .replaceAll(RegExp(r'\d+([\.,]\d+)?'), '')
-          .replaceAll(RegExp(r'[^a-z\s]'), '')
-          .replaceAll(RegExp(r'\s+'), ' ')
-          .trim();
-      return all.map((e) => normalizer(e)).where((e) => e.isNotEmpty).toList();
-    } catch (_) {
-      return all.toList();
-    }
+
+    // Normalizamos toda la lista antes de mandarla al buscador
+    return allRawStrings
+        .map((e) => normalizeIngredient(e))
+        .where((e) => e.isNotEmpty)
+        .toList();
   }
 }

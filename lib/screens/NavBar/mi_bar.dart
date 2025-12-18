@@ -23,10 +23,8 @@ class _MiBarScreenState extends State<MiBarScreen> {
     'Brandy': ['Cognac', 'Armagnac'],
     'Bitters': ['Angostura', 'Chocolate'],
     'Gaseosas': ['Coca Cola', 'Sprite', 'Fanta'],
-    'Frutas': ['Frutilla', 'Durazno', 'Manzana', 'Pera', 'Cereza', 'Frambuesa'],
+    'Frutas': ['Frutilla', 'Durazno', 'Manzana', 'Pera', 'Cereza', 'Frambuesa', 'Lima', 'Limón',],
     'Ingredientes básicos': [
-      'Lima',
-      'Limón',
       'Jugo de lima',
       'Jugo de limón',
       'Rodaja de lima',
@@ -35,7 +33,8 @@ class _MiBarScreenState extends State<MiBarScreen> {
       'Hielo',
       'Soda',
       'Agua',
-      'Jarabe simple'
+      'Jarabe simple',
+      'Espresso'
     ],
   };
 

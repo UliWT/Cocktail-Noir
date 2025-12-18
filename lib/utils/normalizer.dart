@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
+
 String _removeDiacritics(String s) {
   const from = 'áÁéÉíÍóÓúÚñÑüÜ';
-  const to   = 'aAeEiIoOuUnNuU';
+  const to = 'aAeEiIoOuUnNuU';
   var out = s;
   for (var i = 0; i < from.length; i++) {
     out = out.replaceAll(from[i], to[i]);
@@ -11,46 +13,51 @@ String _removeDiacritics(String s) {
 String normalizeText(String input) {
   var s = input.toLowerCase();
   s = _removeDiacritics(s);
-  // reemplazar múltiples separadores por espacio
   s = s.replaceAll(RegExp(r"[\n\t\\/,_\-()\[\].:]"), ' ');
-  // eliminar números y unidades puntuales (pero conservar palabras como 'jugo')
   s = s.replaceAll(RegExp(r"\d+([\.,]\d+)?"), '');
-  // quitar puntuación restante
   s = s.replaceAll(RegExp(r"[^a-z\s]"), '');
-  // normalizar espacios
   s = s.replaceAll(RegExp(r"\s+"), ' ').trim();
   return s;
 }
 
 String normalizeIngredient(String input) {
   var s = normalizeText(input);
-  // quitar palabras comunes que no aportan al match
-  final stop = [
-    'ml','oz','ounce','ounces','shot','shots','cl','tbsp','tsp','cup','cups',
-    'cucharadita','cucharaditas','cucharada','cucharadas','kg','g','l','litro','litros',
-    'jugo','de','rodaja','rodajas','trozo','trozos','slice','slices','cubitos','cubito',
-    'al gusto','a gusto','algun','alguna'
+  
+  // Lista de "stop words" reducida para no borrar ingredientes reales
+  final stopWords = [
+    'ml', 'oz', 'ounce', 'ounces', 'shot', 'shots', 'cl', 'tbsp', 'tsp', 'cup', 'cups',
+    'cucharadita', 'cucharaditas', 'cucharada', 'cucharadas', 'kg', 'g', 'l', 'litro', 'litros',
+    'de', 'al gusto', 'a gusto', 'fresca', 'fresco', 'opcional', 'un', 'una'
   ];
+
   final parts = s.split(' ');
-  final filtered = parts.where((p) => p.isNotEmpty && !stop.contains(p)).toList();
-  return filtered.join(' ');
+  if (parts.length <= 1) return s;
+
+  final filtered = parts.where((p) => p.isNotEmpty && !stopWords.contains(p)).toList();
+  return filtered.isEmpty ? s : filtered.join(' ');
 }
 
-List<String> tokenize(String input) {
-  final s = normalizeIngredient(input);
-  if (s.isEmpty) return [];
-  return s.split(' ');
-}
+/// Compara ingrediente de receta vs ingrediente disponible
+bool ingredientMatches(String recipeIng, String barIng) {
+  // Normalizamos ambos antes de comparar
+  final r = normalizeIngredient(recipeIng);
+  final b = normalizeIngredient(barIng);
 
-bool ingredientMatches(String ingredientNormalized, String availableNormalized) {
-  if (ingredientNormalized.isEmpty || availableNormalized.isEmpty) return false;
-  // match by token overlap
-  final aTokens = availableNormalized.split(' ');
-  final iTokens = ingredientNormalized.split(' ');
-  for (final at in aTokens) {
-    for (final it in iTokens) {
-      if (at == it) return true;
-      if (it.contains(at) || at.contains(it)) return true;
+  if (r.isEmpty || b.isEmpty) return false;
+
+  final rTokens = r.split(' ');
+  final bTokens = b.split(' ');
+
+  // 1. Match Exacto o por Contención Total
+  // (Ej: Bar: "ron blanco" vs Receta: "ron blanco")
+  if (r.contains(b) || b.contains(r)) return true;
+
+  // 2. Match Cruce de Tokens (Atrapamos "Ron" en "Ron Blanco")
+  for (final bt in bTokens) {
+    if (bt.length < 3) continue; // Ignoramos conectores cortos
+    for (final rt in rTokens) {
+      if (rt.length < 3) continue;
+      if (rt == bt || rt.contains(bt) || bt.contains(rt)) return true;
     }
   }
   return false;
