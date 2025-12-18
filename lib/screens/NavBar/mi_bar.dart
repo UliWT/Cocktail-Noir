@@ -24,6 +24,19 @@ final Map<String, List<String>> categorias = {
   'Bitters': ['Angostura', 'Chocolate'],
   'Gaseosas': ['Coca Cola', 'Sprite', 'Fanta'],
   'Frutas': ['Frutilla', 'Durazno', 'Manzana', 'Pera', 'Cereza', 'Frambuesa'],
+  'Ingredientes básicos': [
+    'Lima',
+    'Limón',
+    'Jugo de lima',
+    'Jugo de limón',
+    'Rodaja de lima',
+    'Azúcar',
+    'Almíbar',
+    'Hielo',
+    'Soda',
+    'Agua',
+    'Jarabe simple'
+  ],
 };
 
 

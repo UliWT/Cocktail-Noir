@@ -190,45 +190,5 @@ class DBHelper {
     );
   }
 
-  /// Sincroniza tragos desde la API a la BD local (agrega nuevos, no reemplaza existentes)
-  Future<void> syncCocktailsFromApi(List<Map<String, dynamic>> apiCocktails) async {
-    try {
-      final db = await database;
-      int inserted = 0;
-      int skipped = 0;
-
-      print('Iniciando sincronización de ${apiCocktails.length} cócteles...');
-
-      for (var cocktail in apiCocktails) {
-        try {
-          final nombre = cocktail['nombre'] as String?;
-          if (nombre == null) continue;
-
-          // Verificar si ya existe
-          final existing = await db.query(
-            'tragos',
-            where: 'nombre = ?',
-            whereArgs: [nombre],
-            limit: 1,
-          );
-
-          if (existing.isEmpty) {
-            await db.insert('tragos', cocktail);
-            inserted++;
-          } else {
-            skipped++;
-          }
-        } catch (e) {
-          print('Error insertando cóctel: $e');
-          continue;
-        }
-      }
-
-      print('Sincronización completada: $inserted nuevos, $skipped existentes');
-    } catch (e) {
-      print('Error en syncCocktailsFromApi: $e');
-      rethrow;
-    }
-  }
 }
 

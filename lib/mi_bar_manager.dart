@@ -55,6 +55,20 @@ class MiBarManager {
         all.addAll(set);
       }
     });
-    return all.toList();
+    // Normalizar antes de devolver
+    try {
+      // Import local to avoid top-level import cycle in other files
+      // ignore: avoid_dynamic_calls
+      final normalizer = (String s) => s
+          .toLowerCase()
+          .replaceAll(RegExp(r'[\n\t\\/,_\-()\[\].:]'), ' ')
+          .replaceAll(RegExp(r'\d+([\.,]\d+)?'), '')
+          .replaceAll(RegExp(r'[^a-z\s]'), '')
+          .replaceAll(RegExp(r'\s+'), ' ')
+          .trim();
+      return all.map((e) => normalizer(e)).where((e) => e.isNotEmpty).toList();
+    } catch (_) {
+      return all.toList();
+    }
   }
 }

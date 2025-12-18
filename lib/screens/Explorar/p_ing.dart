@@ -4,6 +4,7 @@ import 'package:myapp/widgets/textField.dart';
 import 'package:myapp/widgets/boton.dart';
 import 'package:myapp/widgets/tarjeta.dart';
 import 'package:myapp/data/db_helper.dart';
+import 'package:myapp/utils/normalizer.dart';
 import 'package:myapp/widgets/modalSheet.dart';
 import 'package:myapp/mi_bar_manager.dart';
 
@@ -42,12 +43,12 @@ class _PIngScreenState extends State<PIngScreen> {
   }
 
   String normalizar(String texto) {
-    return texto
-        .toLowerCase()
-        .replaceAll(RegExp(r'[^\w\s]'), '')
-        .replaceAll(RegExp(r'\d+'), '')
-        .replaceAll(RegExp(r'\s+'), ' ')
-        .trim();
+    // usa utilitario de normalización
+    try {
+      return normalizeIngredient(texto);
+    } catch (_) {
+      return texto.toLowerCase().replaceAll(RegExp(r"[^a-z0-9\s]"), '').replaceAll(RegExp(r'\s+'), ' ').trim();
+    }
   }
 
   void _agregarIngrediente() {
@@ -107,6 +108,7 @@ class _PIngScreenState extends State<PIngScreen> {
       final ingredientesTrago = (trago['ingredientes'] as String)
           .split('\n')
           .map(normalizar)
+          .where((s) => s.isNotEmpty)
           .toList();
 
       // El trago es candidato si contiene todos los términos de filtro (si hay)
@@ -129,7 +131,7 @@ class _PIngScreenState extends State<PIngScreen> {
       // verificar si todos los ingredientes del trago están cubiertos por availableSet
       final missing = <String>[];
       for (var ingr in ingredientesTrago) {
-        final matched = availableSet.any((a) => ingr.contains(a) || a.contains(ingr));
+        final matched = availableSet.any((a) => ingredientMatches(ingr, a));
         if (!matched) missing.add(ingr);
       }
 

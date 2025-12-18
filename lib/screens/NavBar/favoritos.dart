@@ -29,6 +29,7 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
       onFavoritoChanged: () => setState(() {}),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     final favoritos = FavoritosManager().favoritos;
@@ -86,7 +87,10 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
                           child: Tarjeta(
                             nombre: trago['nombre'],
                             descripcion: trago['descripcion'],
-                            tags: List<String>.from(trago['tags']),
+                            // CORRECCIÓN: Manejo de String a List para los tags
+                            tags: (trago['tags'] != null && trago['tags'] is String)
+                                ? List<String>.from(trago['tags'].split(','))
+                                : [],
                             width: double.infinity,
                             trago: trago,
                             onToggleFavorito: () {
