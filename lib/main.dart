@@ -6,8 +6,13 @@ import 'package:myapp/screens/NavBar/favoritos.dart';
 import 'package:myapp/screens/NavBar/mi_bar.dart';
 import 'package:myapp/favoritos_manager.dart';
 
-void main() {
-  FavoritosManager().cargarFavoritos();
+void main() async {
+  // Garantiza que los plugins (como SharedPreferences) funcionen antes del runApp
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Espera a que se carguen los datos del disco
+  await FavoritosManager().cargarFavoritos();
+  
   runApp(const MyApp());
 }
 
