@@ -18,7 +18,7 @@ class _MiBarScreenState extends State<MiBarScreen> {
     'Vodka': ['Clásico', 'Saborizado'],
     'Ginebra': ['London Dry', 'Old Tom', 'Pink Gin'],
     'Vermouth': ['Blanco', 'Rosso', 'Seco'],
-    'Licor': ['Triple Sec', 'Amaretto', 'Baileys', 'Kahlúa', 'Chocolate'],
+    'Licor': ['Triple Sec', 'Amaretto', 'Baileys', 'Kahlúa', 'Chocolate', 'Cachaça'],
     'Aperitivo': ['Campari', 'Aperol', 'Fernet'],
     'Brandy': ['Cognac', 'Armagnac'],
     'Bitters': ['Angostura', 'Chocolate'],
@@ -29,6 +29,7 @@ class _MiBarScreenState extends State<MiBarScreen> {
       'Jugo de limón',
       'Rodaja de lima',
       'Azúcar',
+      'Sal',
       'Almíbar',
       'Hielo',
       'Soda',
@@ -36,6 +37,7 @@ class _MiBarScreenState extends State<MiBarScreen> {
       'Jarabe simple',
       'Espresso'
     ],
+    'Otros':['Hierba buena', 'Albahaca', 'Menta']
   };
 
   final Set<String> desplegados = {};
